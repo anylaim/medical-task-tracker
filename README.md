@@ -4,7 +4,8 @@
 
 ## Требования
 
-## Требования
+- Go `1.23+`
+- Docker Рё Docker Compose
 
 ## Быстрый запуск через Docker Compose
 
@@ -25,19 +26,23 @@ docker compose up --build
 
 ## Swagger
 
-* UI:
-  http://localhost:9000/swagger/
+Swagger UI:
 
-* OpenAPI JSON:
-  http://localhost:9000/swagger/openapi.json
+```text
+http://localhost:9000/swagger/
+```
 
----
+OpenAPI JSON:
+
+```text
+http://localhost:9000/swagger/openapi.json
+```
 
 ## API
 
 Базовый префикс API:
 
-```
+```text
 /api/v1
 ```
 
