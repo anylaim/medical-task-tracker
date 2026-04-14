@@ -9,6 +9,7 @@ import (
 	"github.com/gorilla/mux"
 
 	taskdomain "example.com/taskservice/internal/domain/task"
+	"example.com/taskservice/internal/usecase/task"
 	taskusecase "example.com/taskservice/internal/usecase/task"
 )
 
@@ -21,20 +22,21 @@ func NewTaskHandler(usecase taskusecase.Usecase) *TaskHandler {
 }
 
 func (h *TaskHandler) Create(w http.ResponseWriter, r *http.Request) {
-	var req taskMutationDTO
-	if err := decodeJSON(r, &req); err != nil {
+	var req taskMutationDTO // Это та самая структура, которую мы правили
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		writeError(w, http.StatusBadRequest, err)
 		return
 	}
 
-	// Передаем новые поля в UseCase
-	created, err := h.usecase.Create(r.Context(), taskusecase.CreateInput{
+	created, err := h.usecase.Create(r.Context(), task.CreateInput{
 		Title:           req.Title,
 		Description:     req.Description,
 		Status:          req.Status,
-		RecurrenceType:  req.RecurrenceType,  // Добавлено
-		RecurrenceValue: req.RecurrenceValue, // Добавлено
-		DueDate:         req.DueDate,         // Добавлено
+		RecurrenceType:  req.RecurrenceType,
+		RecurrenceValue: req.RecurrenceValue,
+		DueDate:         req.DueDate,
+		SpecificDates:   req.SpecificDates,
+		ParityType:      req.ParityType,
 	})
 
 	if err != nil {

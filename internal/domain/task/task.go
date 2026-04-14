@@ -15,8 +15,9 @@ type RecurrenceType string
 const (
 	RecurrenceDaily    RecurrenceType = "daily"
 	RecurrenceMonthly  RecurrenceType = "monthly"
-	RecurrenceSpecific RecurrenceType = "specific_dates"
 	RecurrenceParity   RecurrenceType = "parity"
+	RecurrenceSpecific RecurrenceType = "specific"
+	RecurrenceWeekly   RecurrenceType = "weekly"
 )
 
 type Task struct {

@@ -4,14 +4,14 @@ CREATE TABLE IF NOT EXISTS tasks (
     description TEXT NOT NULL DEFAULT '',
     status TEXT NOT NULL,
     
-    recurrence_type TEXT,              -- daily, monthly, specific_dates, parity
-    recurrence_value INT,             -- n-й день или число месяца
-    specific_dates DATE[],            -- массив конкретных дат
-    parity_type TEXT,                 -- even / odd (для четных/нечетных дней)
+    recurrence_type TEXT,
+    recurrence_value INT,
+    specific_dates DATE[],
+    parity_type TEXT,
     
-    due_date DATE,                    -- дата, на которую назначена задача
-    parent_id BIGINT REFERENCES tasks(id) ON DELETE CASCADE, -- ссылка на "шаблон"
-
+    due_date DATE,
+    parent_id BIGINT REFERENCES tasks(id) ON DELETE CASCADE,
+    
     created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
     updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );

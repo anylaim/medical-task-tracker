@@ -24,14 +24,14 @@ type Usecase interface {
 }
 
 type CreateInput struct {
-	Title       string            `json:"title"`
-	Description string            `json:"description"`
-	Status      taskdomain.Status `json:"status"`
-
-	RecurrenceType  *string    `json:"recurrence_type"`
-	RecurrenceValue *int       `json:"recurrence_value"`
-	DueDate         *time.Time `json:"due_date"`
-	ParityType      *string    `json:"parity_type"`
+	Title           string
+	Description     string
+	Status          taskdomain.Status
+	RecurrenceType  *string
+	RecurrenceValue *int
+	DueDate         *time.Time
+	SpecificDates   []time.Time
+	ParityType      *string
 }
 
 type UpdateInput struct {

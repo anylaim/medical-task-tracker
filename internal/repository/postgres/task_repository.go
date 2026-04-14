@@ -22,37 +22,53 @@ func (r *Repository) Create(ctx context.Context, task *taskdomain.Task) (*taskdo
 	const query = `
         INSERT INTO tasks (
             title, description, status, 
-            recurrence_type, recurrence_value, due_date, parent_id,
+            recurrence_type, recurrence_value, specific_dates, parity_type,
+            due_date, parent_id,
             created_at, updated_at
         )
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
-        RETURNING id, title, description, status, recurrence_type, recurrence_value, due_date, parent_id, created_at, updated_at
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11)
+        RETURNING 
+            id, title, description, status,
+            recurrence_type, recurrence_value, specific_dates, parity_type,
+            due_date, parent_id,
+            created_at, updated_at
     `
 
 	row := r.pool.QueryRow(ctx, query,
-		task.Title, task.Description, task.Status,
-		task.RecurrenceType, task.RecurrenceValue, task.DueDate, task.ParentID,
-		task.CreatedAt, task.UpdatedAt,
+		task.Title,
+		task.Description,
+		task.Status,
+		task.RecurrenceType,
+		task.RecurrenceValue,
+		task.SpecificDates,
+		task.ParityType,
+		task.DueDate,
+		task.ParentID,
+		task.CreatedAt,
+		task.UpdatedAt,
 	)
+
 	return scanTask(row)
 }
 
 func (r *Repository) GetByID(ctx context.Context, id int64) (*taskdomain.Task, error) {
 	const query = `
-        SELECT id, title, description, status, 
-               recurrence_type, recurrence_value, due_date, parent_id, 
-               created_at, updated_at
+        SELECT 
+            id, title, description, status,
+            recurrence_type, recurrence_value, specific_dates, parity_type,
+            due_date, parent_id,
+            created_at, updated_at
         FROM tasks
         WHERE id = $1
     `
 
 	row := r.pool.QueryRow(ctx, query, id)
+
 	found, err := scanTask(row)
 	if err != nil {
 		if errors.Is(err, pgx.ErrNoRows) {
 			return nil, taskdomain.ErrNotFound
 		}
-
 		return nil, err
 	}
 
@@ -67,12 +83,21 @@ func (r *Repository) Update(ctx context.Context, task *taskdomain.Task) (*taskdo
             status = $3,
             updated_at = $4
         WHERE id = $5
-        RETURNING id, title, description, status, 
-                  recurrence_type, recurrence_value, due_date, parent_id, 
-                  created_at, updated_at
+        RETURNING 
+            id, title, description, status,
+            recurrence_type, recurrence_value, specific_dates, parity_type,
+            due_date, parent_id,
+            created_at, updated_at
     `
 
-	row := r.pool.QueryRow(ctx, query, task.Title, task.Description, task.Status, task.UpdatedAt, task.ID)
+	row := r.pool.QueryRow(ctx, query,
+		task.Title,
+		task.Description,
+		task.Status,
+		task.UpdatedAt,
+		task.ID,
+	)
+
 	return scanTask(row)
 }
 
@@ -93,9 +118,13 @@ func (r *Repository) Delete(ctx context.Context, id int64) error {
 
 func (r *Repository) List(ctx context.Context) ([]taskdomain.Task, error) {
 	const query = `
-        SELECT id, title, description, status, recurrence_type, recurrence_value, due_date, parent_id, created_at, updated_at
+        SELECT 
+            id, title, description, status,
+            recurrence_type, recurrence_value, specific_dates, parity_type,
+            due_date, parent_id,
+            created_at, updated_at
         FROM tasks
-        ORDER BY due_date ASC, id DESC
+        ORDER BY due_date ASC NULLS LAST, id DESC
     `
 
 	rows, err := r.pool.Query(ctx, query)
@@ -105,6 +134,7 @@ func (r *Repository) List(ctx context.Context) ([]taskdomain.Task, error) {
 	defer rows.Close()
 
 	tasks := make([]taskdomain.Task, 0)
+
 	for rows.Next() {
 		task, err := scanTask(rows)
 		if err != nil {
@@ -112,6 +142,7 @@ func (r *Repository) List(ctx context.Context) ([]taskdomain.Task, error) {
 		}
 		tasks = append(tasks, *task)
 	}
+
 	return tasks, rows.Err()
 }
 
@@ -132,6 +163,8 @@ func scanTask(scanner taskScanner) (*taskdomain.Task, error) {
 		&status,
 		&task.RecurrenceType,
 		&task.RecurrenceValue,
+		&task.SpecificDates,
+		&task.ParityType,
 		&task.DueDate,
 		&task.ParentID,
 		&task.CreatedAt,

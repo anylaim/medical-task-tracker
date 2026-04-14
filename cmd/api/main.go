@@ -73,7 +73,7 @@ type config struct {
 
 func loadConfig() config {
 	cfg := config{
-		HTTPAddr:    envOrDefault("HTTP_ADDR", ":8080"),
+		HTTPAddr:    envOrDefault("HTTP_ADDR", ":9000"),
 		DatabaseDSN: envOrDefault("DATABASE_DSN", "postgres://postgres:postgres@localhost:5432/taskservice?sslmode=disable"),
 	}
 

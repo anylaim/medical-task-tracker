@@ -7,13 +7,14 @@ import (
 )
 
 type taskMutationDTO struct {
-	Title       string            `json:"title"`
-	Description string            `json:"description"`
-	Status      taskdomain.Status `json:"status"`
-
-	RecurrenceType  *string    `json:"recurrence_type"`
-	RecurrenceValue *int       `json:"recurrence_value"`
-	DueDate         *time.Time `json:"due_date"`
+	Title           string            `json:"title"`
+	Description     string            `json:"description"`
+	Status          taskdomain.Status `json:"status"`
+	RecurrenceType  *string           `json:"recurrence_type"`
+	RecurrenceValue *int              `json:"recurrence_value"`
+	DueDate         *time.Time        `json:"due_date"`
+	SpecificDates   []time.Time       `json:"specific_dates"`
+	ParityType      *string           `json:"parity_type"`
 }
 
 type taskDTO struct {
